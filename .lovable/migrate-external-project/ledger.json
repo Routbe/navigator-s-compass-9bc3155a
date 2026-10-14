@@ -1,0 +1,18 @@
+{
+  "source": "github:Routbe/navigator-s-compass-007548e2",
+  "app": "ROUT — QR infrastructure & alias platform (TanStack Start, better-auth, Neon Postgres, Stripe)",
+  "capabilities": [
+    { "capability": "application code (1109 src files, 154 routes)", "source": "github repo", "outcome": "migrate", "status": "in_progress", "next_action": "copy into project, align deps, build" },
+    { "capability": "database schema (94 SQL migrations, Neon Postgres)", "source": "db/*.sql", "outcome": "migrate", "status": "pending", "next_action": "apply to Lovable Cloud Postgres" },
+    { "capability": "database records", "source": "none attached", "outcome": "migrate", "status": "pending", "next_action": "request CSV/JSON exports from Neon dashboard after preview" },
+    { "capability": "auth (better-auth: email/password, magic link, passkeys, 2FA, OAuth Google/GitHub/GitLab/Apple/OIDC)", "source": "src/lib/better-auth.server.ts", "outcome": "migrate", "status": "pending", "next_action": "point better-auth at Lovable Cloud Postgres (neon_auth schema); Lovable-native auth replacement recorded as too large for initial pass" },
+    { "capability": "auth identities / existing users", "source": "none attached", "outcome": "migrate", "status": "pending", "next_action": "request user export (emails + original IDs) from Neon" },
+    { "capability": "Stripe (checkout, connect, webhooks, sponsor)", "source": "code + env keys", "outcome": "preserve", "status": "pending", "next_action": "request Stripe keys via secure secret form before verification" },
+    { "capability": "public API endpoints + cron (/api/public/*)", "source": "src/routes/api_.public.*", "outcome": "preserve", "status": "pending", "next_action": "verify after deploy; cron needs LOVABLE_CRON_SECRET" },
+    { "capability": "OAuth callbacks (many providers)", "source": "env keys", "outcome": "preserve", "status": "pending", "next_action": "request provider keys; update callback URLs at cutover" },
+    { "capability": "storage / uploaded files (Infomaniak, avatar objects)", "source": "code", "outcome": "preserve", "status": "pending", "next_action": "request storage credentials; file bytes export pending" },
+    { "capability": "email (Brevo/react-email templates)", "source": "src/emails, docs/brevo-templates.md", "outcome": "preserve", "status": "pending", "next_action": "request Brevo API key" },
+    { "capability": "secrets (~30 server secrets)", "source": "ENVIRONMENT.md", "outcome": "migrate", "status": "pending", "next_action": "request via secure secret form before live verification" },
+    { "capability": "cutover (rout.be domain, OAuth callback URLs, Stripe webhook URLs)", "source": "n/a", "outcome": "cutover", "status": "pending", "next_action": "after verification" }
+  ]
+}
