@@ -11,6 +11,8 @@ type Row = Record<string, unknown>;
 
 export type IntegrationStatus = {
   title?: string;
+  /** ISO time of the last public activity (live-status window). */
+  lastActiveAt?: string;
   subtitle?: string;
   url?: string;
   image?: string | null;
