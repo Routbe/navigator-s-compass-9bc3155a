@@ -71,6 +71,8 @@ export async function ssoHandles(userId: string): Promise<Record<string, string>
       } else if (p === "bluesky" && !out["bluesky"]) {
         const h = id.displayName && id.displayName.includes(".") ? id.displayName : await atHandleForDid(id.providerAccountId);
         if (h) out[h.endsWith(".wsocial.eu") ? "wsocial" : "bluesky"] = h.toLowerCase();
+      } else if (p === "mastodon" && !out["mastodon"] && id.displayName?.includes("@")) {
+        out["mastodon"] = id.displayName.toLowerCase();
       }
     }
   } catch (e) {
