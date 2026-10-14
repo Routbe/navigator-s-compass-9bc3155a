@@ -3,6 +3,7 @@ import { createStart, createCsrfMiddleware, createMiddleware } from "@tanstack/r
 import { renderErrorPage } from "./lib/error-page";
 import { isStrictPath, securityHeaders, sessionCookieProblems } from "./lib/security-headers";
 import { appMode, modeDecision } from "./lib/app-mode";
+import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
 
 const errorMiddleware = createMiddleware().server(async ({ next }) => {
   try {
@@ -81,5 +82,6 @@ const appModeMiddleware = createMiddleware().server(async ({ request, next }) =>
 // Sessions are carried by the httpOnly `rout_session` cookie (Neon), so no
 // client-side token attacher is needed on server functions.
 export const startInstance = createStart(() => ({
+  functionMiddleware: [attachSupabaseAuth],
   requestMiddleware: [errorMiddleware, appModeMiddleware, securityHeadersMiddleware, csrfMiddleware],
 }));
