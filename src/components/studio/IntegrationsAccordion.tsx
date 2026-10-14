@@ -19,6 +19,7 @@ import { disconnectSpotifyPresence, setSpotifyPresenceScope, getMyPresence, setS
 import { SnapchatPanel } from "@/components/studio/SnapchatPanel";
 import { getMyIntegrations, removeIntegration, saveIntegration } from "@/lib/integrations.functions";
 import { VerifyOwnership } from "@/components/studio/VerifyOwnership";
+import { OfficialVerifyButton, hasOfficialVerify } from "@/components/studio/OfficialVerifyButton";
 import { isBioVerifiable } from "@/lib/open-web-rules";
 
 const SPOTIFY_MESSAGES: Record<string, [ok: boolean, text: string]> = {
@@ -88,6 +89,19 @@ export function IntegrationsAccordion() {
   }, []);
 
   const refresh = () => qc.invalidateQueries({ queryKey: ["my-integrations"] });
+
+  // Back from an official sign-in: a matching linked account marks the saved handle as verified (server re-checks).
+  useEffect(() => {
+    for (const [provider, row] of saved) {
+      const proven = sso[provider];
+      if (row.verified || !proven) continue;
+      if (proven.replace(/^@/, "").toLowerCase() !== row.handle.replace(/^@/, "").toLowerCase()) continue;
+      void save({ data: { provider, audience: row.audience, visible: row.visible, useSso: true } }).then((r) => {
+        if (r.ok) { toast.success("Geverifieerd via officiële login"); void refresh(); }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [saved, sso]);
 
   const persist = async (item: Integration, opts: { handle?: string; audience: Audience; visible: boolean; useSso?: boolean; showOnVerified?: boolean; showOnAlias?: boolean }) => {
     if (mine.data && !mine.data.ready) {
@@ -273,6 +287,9 @@ export function IntegrationsAccordion() {
                 ) : connected && row ? (
                   <div className="space-y-2">
                     <p className="truncate font-mono text-[11px] text-muted-foreground">Opgeslagen: {item.mode === "address" ? row.handle : `@${row.handle.replace(/^@/, "")}`}</p>
+                    {!row.verified && hasOfficialVerify(item.id) && (
+                      <OfficialVerifyButton provider={item.id} handle={row.handle} label={item.label} />
+                    )}
                     {!row.verified && isBioVerifiable(item.id) && (
                       <VerifyOwnership provider={item.id as "bluesky" | "wsocial" | "mastodon" | "github"} label={item.label} onVerified={() => void refresh()} />
                     )}

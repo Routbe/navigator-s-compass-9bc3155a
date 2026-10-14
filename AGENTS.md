@@ -19,7 +19,7 @@
 - Every sign-in method returns through `/auth/continue`; destinations and tour drafts use HttpOnly cookies, never URLs. Tour drafts apply only to new accounts; taken handles fall back to onboarding. Why: zero-hop redirects, no token leakage, existing members never overwritten. Auth emails use `sendLocalizedEmail` with static template IDs and non-blocking dispatch so provider outages never break sign-in.
 - Bot checks run only via self-hosted ALTCHA proof-of-work (`altcha.server.ts`, single-use via `altcha_used` db/54); `api_/auth/$.ts` refuses email auth flows with `altcha_invalid` (400) before Better Auth runs. Why: no third-party bot service, no tracking.
 - Community stats are live counts; reviews show only when `approved` (db/65); empty sections hide. Approving a verification cancels that user's other open same-tier requests (`verification-dedupe.ts`). Why: no fake social proof or duplicate work.
-- Vercel builds use nitro's `vercel` preset (auto via `VERCEL`); the sandbox forces cloudflare, so test with sandbox env vars unset.
+- Vercel builds use nitro's `vercel` preset (via `VERCEL`); sandbox forces cloudflare.
 - Third-party images on public pages load only via `/api/public/proxy-image` (host allowlist in `src/lib/image-proxy-rules.ts`). Why: visitors' IPs must never reach third-party image hosts.
 - Emailed action links (review, booking) only confirm on GET, change on POST; status mails send fire-and-forget. Why: scanners open links; mail failures never block actions.
 - 2FA/passkeys: Better Auth `twoFactor` + `@better-auth/passkey`, tables in `neon_auth` (db/77). Why: no custom crypto.
@@ -32,3 +32,4 @@
 - Guestbook (`guestbook.server.ts`, db/90): only signed-in members post, owners pin/delete via `owner_id` checks, public reads return pinned notes of public profiles only. Why: verified network effect, no spam, privacy enforced server-side.
 
 - Admin control uses authenticated RPCs with assertAdminRole, keyset pages and explicit errors; transport logs store actual HTTP status/direction, never URLs or request bodies. Why: protect private data and avoid invented telemetry.
+- Live-status windows: `live-presence-rules.ts`, applied server-side. Why: no client trust.

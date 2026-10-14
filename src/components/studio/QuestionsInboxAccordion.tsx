@@ -5,7 +5,8 @@ import { toast } from "sonner";
 import { EyeOff, Send, Trash2 } from "lucide-react";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { answerMyQuestion, deleteMyQuestion, getMyQuestions, unpublishMyQuestion } from "@/lib/questions.functions";
+import { Switch } from "@/components/ui/switch";
+import { answerMyQuestion, deleteMyQuestion, getMyQuestions, setMyQuestionsEnabled, unpublishMyQuestion } from "@/lib/questions.functions";
 import { ANSWER_MAX } from "@/lib/questions-rules";
 
 /** Studio inbox: anonymous questions; answering + "Publiceer" puts them on the public profile. */
@@ -15,6 +16,7 @@ export function QuestionsInboxAccordion() {
   const answer = useServerFn(answerMyQuestion);
   const unpublish = useServerFn(unpublishMyQuestion);
   const del = useServerFn(deleteMyQuestion);
+  const setEnabled = useServerFn(setMyQuestionsEnabled);
   const q = useQuery({ queryKey: ["my-questions"], queryFn: () => fetchMine(), retry: false });
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const items = q.data?.questions ?? [];
@@ -39,6 +41,20 @@ export function QuestionsInboxAccordion() {
         </span>
       </AccordionTrigger>
       <AccordionContent className="space-y-3 pb-5">
+        <label className="flex items-center justify-between gap-3 rounded-xl border border-border p-3 text-sm">
+          <span>
+            <span className="block font-medium">Anonieme vragen op mijn profiel</span>
+            <span className="block text-xs text-muted-foreground">Uit = het blok is verborgen en er komen geen nieuwe vragen binnen.</span>
+          </span>
+          <Switch
+            checked={q.data?.enabled !== false}
+            onCheckedChange={async (v) => {
+              await setEnabled({ data: { enabled: v } });
+              toast.success(v ? "Vragen staan aan" : "Vragen staan uit");
+              void refresh();
+            }}
+          />
+        </label>
         {items.length === 0 && <p className="text-xs text-muted-foreground">Nog geen vragen. Bezoekers kunnen er anoniem een stellen op je profiel.</p>}
         {items.map((it) => (
           <div key={it.id} className={`space-y-2 rounded-xl border p-3 ${it.published ? "border-primary/50 bg-primary/5" : "border-border"}`}>

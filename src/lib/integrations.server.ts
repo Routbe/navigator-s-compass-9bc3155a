@@ -1,3 +1,4 @@
+import { isLiveActive } from "./live-presence-rules";
 /**
  * Connections Hub storage + public live-status fetchers. Server-only.
  * `verified` is derived here from real sign-in identities or a server-side bio-check — never from input.
@@ -10,6 +11,8 @@ type Row = Record<string, unknown>;
 
 export type IntegrationStatus = {
   title?: string;
+  /** ISO time of the last public activity (live-status window). */
+  lastActiveAt?: string;
   subtitle?: string;
   url?: string;
   image?: string | null;
@@ -71,6 +74,8 @@ export async function ssoHandles(userId: string): Promise<Record<string, string>
       } else if (p === "bluesky" && !out["bluesky"]) {
         const h = id.displayName && id.displayName.includes(".") ? id.displayName : await atHandleForDid(id.providerAccountId);
         if (h) out[h.endsWith(".wsocial.eu") ? "wsocial" : "bluesky"] = h.toLowerCase();
+      } else if (p === "mastodon" && !out["mastodon"] && id.displayName?.includes("@")) {
+        out["mastodon"] = id.displayName.toLowerCase();
       }
     }
   } catch (e) {
@@ -144,6 +149,7 @@ export async function fetchStatus(provider: string, handle: string): Promise<Int
         subtitle: push ? `${push.repo?.name ?? ""} · ${(push.payload?.commits?.at(-1)?.message ?? "").split("\n")[0]}`.slice(0, 120) : undefined,
         url: `https://github.com/${handle}`,
         image: `https://avatars.githubusercontent.com/${handle}`,
+        lastActiveAt: last?.created_at,
       };
     }
     case "gitlab": {
@@ -159,6 +165,7 @@ export async function fetchStatus(provider: string, handle: string): Promise<Int
         subtitle: last?.push_data?.commit_title?.slice(0, 120),
         url: `https://gitlab.com/${handle}`,
         image: u.avatar_url ?? null,
+        lastActiveAt: last?.created_at,
       };
     }
     case "wakatime": {
@@ -450,7 +457,7 @@ export async function publicIntegrations(handle: string, mode: "pro" | "social" 
   const shown = visibleForMode(rows.map((r) => ({ ...toMine(r), row: r })), mode).filter((m) =>
     isShownPublicly(switches, m.provider),
   );
-  return Promise.all(
+  const all = await Promise.all(
     shown.map(async ({ row, ...m }) => {
       const cached = (row["status_json"] as IntegrationStatus | null) ?? null;
       const at = row["status_at"] ? Date.parse(String(row["status_at"])) : 0;
@@ -468,6 +475,8 @@ export async function publicIntegrations(handle: string, mode: "pro" | "social" 
       return { ...m, status: cached };
     }),
   );
+  // Live-status components only show while (recently) in use.
+  return all.filter((m) => isLiveActive(m.provider, m.status?.lastActiveAt ?? null));
 }
 
 /**

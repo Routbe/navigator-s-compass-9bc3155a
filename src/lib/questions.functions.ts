@@ -35,10 +35,11 @@ export const getMyQuestions = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const s = await import("./questions.server");
     try {
-      return { ready: true, questions: await s.myQuestions(context.userId) };
+      const [questions, enabled] = await Promise.all([s.myQuestions(context.userId), s.questionsEnabled(context.userId)]);
+      return { ready: true, enabled, questions };
     } catch (e) {
       console.error("[questions] inbox failed", e instanceof Error ? e.message : e);
-      return { ready: false, questions: [] };
+      return { ready: false, enabled: true, questions: [] };
     }
   });
 
@@ -67,5 +68,14 @@ export const deleteMyQuestion = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const s = await import("./questions.server");
     await s.deleteQuestion(context.userId, data.id);
+    return { ok: true };
+  });
+
+export const setMyQuestionsEnabled = createServerFn({ method: "POST" })
+  .middleware([requireAuth])
+  .inputValidator((input: unknown) => z.object({ enabled: z.boolean() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const s = await import("./questions.server");
+    await s.setQuestionsEnabled(context.userId, data.enabled);
     return { ok: true };
   });
