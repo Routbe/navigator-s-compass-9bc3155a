@@ -32,4 +32,4 @@
 - Guestbook (`guestbook.server.ts`, db/90): only signed-in members post, owners pin/delete via `owner_id` checks, public reads return pinned notes of public profiles only. Why: verified network effect, no spam, privacy enforced server-side.
 
 - Admin control uses authenticated RPCs with assertAdminRole, keyset pages and explicit errors; transport logs store actual HTTP status/direction, never URLs or request bodies. Why: protect private data and avoid invented telemetry.
-- Live-status visibility windows live only in `src/lib/live-presence-rules.ts` and are applied server-side in `publicIntegrations`. Why: inactive integrations must disappear without client trust.
+- Live-status windows: `live-presence-rules.ts`, applied server-side. Why: no client trust.
