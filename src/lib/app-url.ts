@@ -18,6 +18,12 @@ import { APP_DOMAINS, normalizeHost, PRIMARY_DOMAIN } from "@/lib/app-domains";
 /** Hosts waarop we auth-callbacks vertrouwen. */
 const APPROVED_HOSTS: readonly string[] = [
   ...APP_DOMAINS,
+  // Explicit: the bare apex (https://rout.be, no www) is a production host —
+  // isApprovedHost already matches it via APP_DOMAINS, but keep it on the list
+  // by name so the split deployment (rout.be public / rout.dlp.li admin)
+  // stays obvious when APP_DOMAINS changes.
+  "rout.be",
+  "www.rout.be",
   "app.dlp.li",
   "maximilien.brussels",
   // Lovable preview/publish hosts: OAuth state cookies are set on the live
