@@ -420,7 +420,7 @@ export function ProfileView({
         {profile.username && <TipJarButton handle={profile.username} theme={t} />}
         <ProfilePassport handle={profile.username} theme={t} />
         {profile.username && <ProfileGuestbook handle={profile.username} theme={t} />}
-        {profile.username && <ProfileQuestions handle={profile.username} theme={t} />}
+        {profile.username && prefs.questionsEnabled && <ProfileQuestions handle={profile.username} theme={t} />}
 
         {earlyBeliever && (
           <EarlyBelieverBadge

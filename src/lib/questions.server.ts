@@ -36,7 +36,8 @@ function toQ(r: Row): Question {
 async function publicOwnerId(handle: string): Promise<string | null> {
   const rows = (await sql`select id from public.profiles
      where lower(username) = lower(${handle})
-       and coalesce((display_prefs ->> 'publicProfile')::boolean, true) limit 1`) as Row[];
+       and coalesce((display_prefs ->> 'publicProfile')::boolean, true)
+       and coalesce((display_prefs ->> 'questionsEnabled')::boolean, true) limit 1`) as Row[];
   return rows[0] ? String(rows[0]["id"]) : null;
 }
 
@@ -80,4 +81,15 @@ export async function unpublishQuestion(ownerId: string, id: string): Promise<vo
 
 export async function deleteQuestion(ownerId: string, id: string): Promise<void> {
   await sql`delete from public.profile_questions where id = ${id} and owner_id = ${ownerId}`;
+}
+
+export async function questionsEnabled(ownerId: string): Promise<boolean> {
+  const rows = (await sql`select coalesce((display_prefs ->> 'questionsEnabled')::boolean, true) as on from public.profiles where id = ${ownerId}`) as Row[];
+  return rows[0]?.["on"] !== false;
+}
+
+/** Owner toggle: off hides the block and the server refuses new questions. */
+export async function setQuestionsEnabled(ownerId: string, on: boolean): Promise<void> {
+  await sql`update public.profiles set display_prefs = coalesce(display_prefs, '{}'::jsonb) || jsonb_build_object('questionsEnabled', ${on}::boolean)
+     where id = ${ownerId}`;
 }
