@@ -121,7 +121,7 @@ export async function verifyAltcha(
       values (${signature}, to_timestamp(${expires}))
       on conflict (signature) do nothing
       returning signature
-    ` as unknown[];
+    `;
     let rows: unknown[];
     try {
       rows = (await insert()) as unknown as unknown[];

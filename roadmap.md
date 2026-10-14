@@ -31,3 +31,5 @@
 - [ ] Ingelogde claim en paspoort-pop-up end-to-end controleren (wacht op een testaccount en badge/claimlink; geen openbare profielen met stempels aanwezig)
 - [x] Publieke/admin shells + preview-schakelaar
 - [x] db/92 toegepast in Neon via migrate-gateway
+
+- [x] Inlogcrash op Vercel (connector-only databasecheck) verholpen; na deploy health + e-maillogin op rout.be en rout.dlp.li testen

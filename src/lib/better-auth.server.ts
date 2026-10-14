@@ -4,7 +4,7 @@ import { magicLink } from "better-auth/plugins/magic-link";
 import { genericOAuth } from "better-auth/plugins/generic-oauth";
 import { twoFactor } from "better-auth/plugins/two-factor";
 import { passkey } from "@better-auth/passkey";
-import { GatewayPool } from "@/lib/neon";
+import { GatewayPool, databaseTransport, hasDatabase } from "@/lib/neon";
 import { APP_DOMAINS } from "@/lib/app-domains";
 import { canonicalAppUrl, isApprovedHost } from "@/lib/app-url";
 
@@ -53,7 +53,7 @@ function envAny(name: string): string | undefined {
 export function resolveAuthSecret(): { secret: string; derived: boolean } | null {
   const direct = envAny("BETTER_AUTH_SECRET");
   if (direct && direct.length >= 32) return { secret: direct, derived: false };
-  const seed = env("SESSION_SECRET") ?? env("OAUTH_STATE_SECRET") ?? env("NEON_API_KEY");
+  const seed = env("SESSION_SECRET") ?? env("OAUTH_STATE_SECRET") ?? env("DATABASE_URL") ?? env("NEON_API_KEY");
   if (!seed) return null;
   const secret = createHash("sha256").update(`rout-better-auth:${seed}`).digest("hex");
   return { secret, derived: true };
@@ -132,7 +132,11 @@ function gitlabIssuer(): string {
 }
 
 export function createRoutAuth(request?: Request) {
-  if (!process.env["NEON_API_KEY"] || !process.env["LOVABLE_API_KEY"]) throw new Error("Neon-connector ontbreekt (NEON_API_KEY).");
+  // Either transport is fine: DATABASE_URL on Vercel, the Neon connector in Lovable.
+  if (!hasDatabase()) {
+    console.error("[auth] no database configured: set DATABASE_URL (Vercel) or link the Neon connector.");
+    throw new Error("DATABASE_URL ontbreekt: geen databaseverbinding ingesteld.");
+  }
   const resolved = resolveAuthSecret();
   if (!resolved) throw new Error("BETTER_AUTH_SECRET ontbreekt.");
   if (resolved.derived) console.warn("[auth] BETTER_AUTH_SECRET missing or <32 chars; using derived fallback. Set it on Vercel.");
@@ -412,7 +416,7 @@ export async function liveAuthChecks() {
   let database = false;
   let databaseError: string | null = null;
   try {
-    if (process.env["NEON_API_KEY"]) {
+    if (hasDatabase()) {
       const pool = new GatewayPool();
       await pool.query("select 1 from neon_auth.verification limit 1");
       database = true;
@@ -420,7 +424,7 @@ export async function liveAuthChecks() {
   } catch (e) {
     databaseError = e instanceof Error ? e.message.slice(0, 120) : "unknown";
   }
-  return { database, databaseError, emailService: Boolean(env("BREVO_API_KEY")) };
+  return { database, databaseError, databaseTransport: databaseTransport(), emailService: Boolean(env("BREVO_API_KEY")) };
 }
 
 /** Diagnostic report — names only, never values. */
@@ -428,7 +432,7 @@ export function authDiagnostics(request?: Request) {
   const base = baseUrlFor(request);
   const resolved = resolveAuthSecret();
   const core = {
-    DATABASE_URL: Boolean(process.env["NEON_API_KEY"]),
+    DATABASE_URL: hasDatabase(),
     BETTER_AUTH_SECRET: Boolean(resolved),
     BETTER_AUTH_URL: Boolean(env("BETTER_AUTH_URL") ?? env("NEXT_PUBLIC_APP_URL")),
   };

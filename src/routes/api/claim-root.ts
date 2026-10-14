@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { neon } from "@/lib/neon";
+import { hasDatabase, sql } from "@/lib/neon";
 import { z } from "zod";
 import { currentUser } from "@/lib/auth/session.server";
 import { clientIp } from "@/lib/api-guard.server";
@@ -93,13 +93,11 @@ export const Route = createFileRoute("/api/claim-root")({
         const cleanHandle = handle.replace(/^@/, "").toLowerCase();
         const requestedSubdomain = `${cleanHandle}.rout.be`;
 
-        const databaseUrl = process.env["NEON_API_KEY"];
         const brevoApiKey = process.env["BREVO_API_KEY"];
-        if (!databaseUrl) {
+        if (!hasDatabase()) {
+          console.error("[claim-root] no database configured (DATABASE_URL or Neon connector)");
           return Response.json({ error: "Serverconfiguratie ontbreekt" }, { status: 500 });
         }
-
-        const sql = neon(databaseUrl);
 
         // 3. Dubbele claim afvangen.
         const existing = (await sql`

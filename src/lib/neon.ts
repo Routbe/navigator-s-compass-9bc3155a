@@ -12,7 +12,7 @@
  * `sql.transaction([...])`. One call = one HTTP request (no session state).
  */
 
-import { neon as neonHttp, Pool } from "@neondatabase/serverless";
+import { neon as neonHttp, neonConfig, Pool } from "@neondatabase/serverless";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/neon/sql";
 
@@ -24,6 +24,40 @@ type GatewayResult = { rows: Row[]; rowCount: number | null; command: string };
 function databaseUrl(): string | null {
   const url = process.env["DATABASE_URL"];
   return url && url.trim() ? url : null;
+}
+
+/**
+ * True when any database transport is configured: DATABASE_URL (Vercel /
+ * production) or the Lovable Neon connector (NEON_API_KEY + LOVABLE_API_KEY).
+ * Server code must use this instead of checking one transport's variables.
+ */
+export function hasDatabase(): boolean {
+  if (databaseUrl()) return true;
+  return Boolean(process.env["NEON_API_KEY"] && process.env["LOVABLE_API_KEY"]);
+}
+
+/** Which transport is active — for diagnostics only, never a value. */
+export function databaseTransport(): "direct" | "gateway" | "none" {
+  if (databaseUrl()) return "direct";
+  return hasDatabase() ? "gateway" : "none";
+}
+
+let wsReady = false;
+/**
+ * The pooled (transaction) client needs a WebSocket. Node 22+ / workerd ship one;
+ * older Node runtimes do not, so fall back to the `ws` package once.
+ */
+async function ensureWebSocket(): Promise<void> {
+  if (wsReady) return;
+  if (typeof (globalThis as { WebSocket?: unknown }).WebSocket === "undefined" && !neonConfig.webSocketConstructor) {
+    try {
+      const mod = (await import("ws")) as unknown as { default?: unknown; WebSocket?: unknown };
+      neonConfig.webSocketConstructor = (mod.default ?? mod.WebSocket ?? mod) as never;
+    } catch (err) {
+      console.error("[neon] no WebSocket available for the pooled connection:", err);
+    }
+  }
+  wsReady = true;
 }
 
 let directHttp: ReturnType<typeof neonHttp> | null = null;
@@ -45,7 +79,9 @@ function pool(): Pool | null {
 function gatewayHeaders(): Record<string, string> {
   const lovable = process.env["LOVABLE_API_KEY"];
   const connection = process.env["NEON_API_KEY"];
-  if (!lovable || !connection) throw new Error("Missing LOVABLE_API_KEY or NEON_API_KEY for the Neon connector.");
+  if (!lovable || !connection) {
+    throw new Error("No database configured: set DATABASE_URL (Vercel) or link the Neon connector (NEON_API_KEY + LOVABLE_API_KEY).");
+  }
   return {
     Authorization: `Bearer ${lovable}`,
     "X-Connection-Api-Key": connection,
@@ -97,6 +133,7 @@ export async function runQuery(query: string, params: unknown[] = []): Promise<G
 export async function runBatch(statements: Statement[]): Promise<GatewayResult[]> {
   const tx = pool();
   if (tx) {
+    await ensureWebSocket();
     // Real transaction over the direct connection: all or nothing.
     const client = await tx.connect();
     try {
@@ -209,13 +246,19 @@ export class GatewayPool {
     const q = typeof text === "string" ? text : text.text;
     const p = typeof text === "string" ? (values ?? []) : (text.values ?? values ?? []);
     const directPool = pool();
-    if (directPool) return directPool.query(q, normaliseParams(p));
+    if (directPool) {
+      await ensureWebSocket();
+      return directPool.query(q, normaliseParams(p));
+    }
     if (TX_NOOP.test(q)) return { rows: [], rowCount: 0, command: "NOOP", fields: [] };
     return toPgResult((await runQuery(q, p)) as never);
   }
   async connect() {
     const directPool = pool();
-    if (directPool) return directPool.connect();
+    if (directPool) {
+      await ensureWebSocket();
+      return directPool.connect();
+    }
     return {
       query: (text: string | { text: string; values?: unknown[] }, values?: unknown[]) => this.query(text, values),
       release: () => undefined,
