@@ -176,6 +176,13 @@ class LazyQuery implements PromiseLike<Row[]> {
   ): Promise<A | B> {
     return this.run().then(onfulfilled, onrejected);
   }
+  /** Promise compatibility: `sql\`...\`.catch()` must work like a real promise. */
+  catch<B = never>(onrejected?: ((reason: unknown) => B | PromiseLike<B>) | null): Promise<Row[] | B> {
+    return this.run().catch(onrejected);
+  }
+  finally(onfinally?: (() => void) | null): Promise<Row[]> {
+    return this.run().finally(onfinally);
+  }
 }
 
 class RawSql {
