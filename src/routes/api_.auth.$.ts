@@ -139,6 +139,16 @@ export async function handleAuthRequest({ request }: { request: Request }) {
     }
 
     const res = await createRoutAuth(request).handler(request);
+    if (res.status >= 400 && !/callback/.test(relativePath)) {
+      // Better Auth reports most failures as an error response, not a throw:
+      // log the exact payload server-side instead of only a bare status code.
+      try {
+        const body = await res.clone().text();
+        console.error("[BetterAuth Error]:", { status: res.status, body: body.slice(0, 2000), ...traceContext(request, relativePath) });
+      } catch {
+        /* a body-read failure must never break the response */
+      }
+    }
     if (/callback/.test(relativePath)) {
       // Better Auth reports state/cookie problems as a redirect with ?error=.
       const loc = res.headers.get("location") ?? "";
@@ -163,6 +173,7 @@ export async function handleAuthRequest({ request }: { request: Request }) {
     }
     return res;
   } catch (err) {
+    console.error("[BetterAuth Error]:", err);
     const raw = err instanceof Error ? err.message : String(err);
     console.error("[auth] handler failed:", {
       message: raw,

@@ -116,15 +116,23 @@ export async function verifyAltcha(
 
   try {
     await ensureTable();
-    const rows = (await sql`
+    const insert = () => sql`
       insert into public.altcha_used (signature, expires_at)
       values (${signature}, to_timestamp(${expires}))
       on conflict (signature) do nothing
       returning signature
-    `) as unknown[];
+    ` as unknown[];
+    let rows: unknown[];
+    try {
+      rows = (await insert()) as unknown as unknown[];
+    } catch {
+      // One immediate retry: a transient gateway/network blip must never turn
+      // a valid, freshly solved proof into a failed sign-in.
+      rows = (await insert()) as unknown as unknown[];
+    }
     if (rows.length === 0) return { ok: false, reason: "replayed" };
   } catch (err) {
-    console.error("[altcha] replay store failed:", err instanceof Error ? err.message : err);
+    console.error("[ALTCHA Error]: replay store unavailable:", err instanceof Error ? err.message : err);
     return { ok: false, reason: "store_unavailable" };
   }
   return { ok: true };

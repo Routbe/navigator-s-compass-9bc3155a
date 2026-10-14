@@ -336,7 +336,9 @@ export function createRoutAuth(request?: Request) {
     plugins: plugins as never,
     trustedOrigins: [
       canonicalAppUrl(),
-      ...APP_DOMAINS.flatMap((d) => [`https://${d}`, `https://*.${d}`]),
+      // Both schemes, apex + wildcards: logins must work on https://rout.be
+      // (bare apex, no www) AND http://rout.be without an origin mismatch.
+      ...APP_DOMAINS.flatMap((d) => [`https://${d}`, `https://*.${d}`, `http://${d}`, `http://*.${d}`]),
       "http://localhost:8080",
       "http://localhost:*",
       "http://127.0.0.1:*",

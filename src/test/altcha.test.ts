@@ -1,11 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createHash } from "node:crypto";
 
+const state = vi.hoisted(() => ({ failNextInsert: false }));
 const used = new Set<string>();
 vi.mock("@/lib/neon", () => ({
   sql: (strings: TemplateStringsArray, ...values: unknown[]) => {
     const q = strings.join("?");
     if (q.includes("insert into public.altcha_used")) {
+      if (state.failNextInsert) {
+        state.failNextInsert = false;
+        return Promise.reject(new Error("transient gateway blip"));
+      }
       const sig = values[0] as string;
       if (used.has(sig)) return Promise.resolve([]);
       used.add(sig);
@@ -52,5 +57,10 @@ describe("altcha", () => {
     p.number = p.number + 1;
     expect((await verifyAltcha(Buffer.from(JSON.stringify(p)).toString("base64"))).ok).toBe(false);
     expect(await verifyAltcha(solve(await createAltchaChallenge()), { requireHard: true })).toEqual({ ok: false, reason: "too_easy" });
+  });
+  it("retries a transient replay-store failure once instead of failing the sign-in", async () => {
+    const proof = solve(await createAltchaChallenge());
+    state.failNextInsert = true;
+    expect(await verifyAltcha(proof)).toEqual({ ok: true });
   });
 });
