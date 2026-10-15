@@ -79,6 +79,8 @@ export function spotifyAuthorizeUrl(userId: string, origin?: Request | string): 
     scope: SCOPES,
     redirect_uri: spotifyRedirectUri(origin),
     state: signSpotifyState(userId),
+    // Always show the consent screen so a silent browser session can't skip the grant.
+    show_dialog: "true",
   });
   return `https://accounts.spotify.com/authorize?${p}`;
 }
@@ -270,9 +272,11 @@ export async function setSpotifyScope(userId: string, scope: { verified: boolean
     where user_id = ${userId} and provider = 'spotify'`;
 }
 
+/** Hard unlink: removes every Spotify row (tokens, status, integration) for the user. */
 export async function disconnectSpotify(userId: string) {
   await sql`delete from public.user_music_status where user_id = ${userId}`;
   await sql`delete from public.user_presence_connections where user_id = ${userId} and provider = 'spotify'`;
+  await sql`delete from public.user_integrations where user_id = ${userId} and provider = 'spotify'`;
 }
 
 /** Public lookup: the owner of a handle, only when they opted in and the profile is public. */
