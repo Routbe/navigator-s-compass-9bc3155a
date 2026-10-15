@@ -15,7 +15,7 @@ import {
   type IntegrationFilter,
 } from "@/lib/integrations-catalog";
 import { normalizeIntegrationValue, type Audience } from "@/lib/integrations-rules";
-import { disconnectSpotifyPresence, setSpotifyPresenceScope, getMyPresence, setSpotifyPresenceVisible } from "@/lib/presence.functions";
+import { disconnectSpotifyPresence, setSpotifyPresenceScope, getMyPresence, setSpotifyPresenceVisible, testSpotifyPresence } from "@/lib/presence.functions";
 import { SnapchatPanel } from "@/components/studio/SnapchatPanel";
 import { getMyIntegrations, removeIntegration, saveIntegration } from "@/lib/integrations.functions";
 import { VerifyOwnership } from "@/components/studio/VerifyOwnership";
@@ -63,6 +63,7 @@ export function IntegrationsAccordion() {
   const setVisible = useServerFn(setSpotifyPresenceVisible);
   const disconnect = useServerFn(disconnectSpotifyPresence);
   const setScope = useServerFn(setSpotifyPresenceScope);
+  const testSpotify = useServerFn(testSpotifyPresence);
   const fetchMine = useServerFn(getMyIntegrations);
   const save = useServerFn(saveIntegration);
   const remove = useServerFn(removeIntegration);
@@ -280,6 +281,24 @@ export function IntegrationsAccordion() {
                         }
                       }}
                     />
+                    <button
+                      type="button"
+                      disabled={busy === item.id}
+                      onClick={async () => {
+                        setBusy(item.id);
+                        try {
+                          const r = await testSpotify();
+                          (r.ok ? toast.success : toast.error)(r.message, { duration: 10000 });
+                        } catch {
+                          toast.error("Test mislukt. Probeer opnieuw.");
+                        } finally {
+                          setBusy(null);
+                        }
+                      }}
+                      className="inline-flex h-8 w-full items-center justify-center rounded-lg border border-border text-xs font-medium hover:bg-muted"
+                    >
+                      Test verbinding
+                    </button>
                     <button type="button" onClick={() => void unlink(item)} disabled={busy === item.id} className="inline-flex h-8 w-full items-center justify-center rounded-lg border border-border text-xs font-medium hover:bg-muted">
                       Ontkoppelen
                     </button>
