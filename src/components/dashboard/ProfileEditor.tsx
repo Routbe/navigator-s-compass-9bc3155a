@@ -128,7 +128,6 @@ import {
 } from "@/lib/alias-profile.functions";
 import { SubdomainPanel } from "@/components/dashboard/SubdomainPanel";
 import { BadgesPanel } from "@/components/dashboard/BadgesPanel";
-import { SocialVerifyPanel } from "@/components/dashboard/SocialVerifyPanel";
 import { TotalReachButton } from "@/components/dashboard/TotalReachModal";
 import { BadgeActivityPanel } from "@/components/dashboard/BadgeActivityPanel";
 import { EmailForwardingPanel } from "@/components/dashboard/EmailForwardingPanel";
@@ -138,7 +137,6 @@ import { oauthAvatarOf } from "@/lib/oauth-avatar";
 import { BlueskyWizard } from "@/components/dashboard/BlueskyWizard";
 import { LiveStatusAccordion } from "@/components/studio/LiveStatusAccordion";
 import { ShareMenu } from "@/components/profile/ShareMenu";
-import { IntegrationsAccordion } from "@/components/studio/IntegrationsAccordion";
 
 export type ProfileVariant = "verified" | "alias";
 
@@ -940,8 +938,6 @@ export function ProfileEditor({ variant = "verified" }: { variant?: ProfileVaria
 
               <LiveStatusAccordion prefs={prefs} setPref={setPref} />
 
-              <IntegrationsAccordion />
-
               <QuestionsInboxAccordion />
 
               <GuestbookAccordion />
@@ -954,9 +950,8 @@ export function ProfileEditor({ variant = "verified" }: { variant?: ProfileVaria
                 onOpenAddDrawer={() => setDrawer(true)}
                 onQuickCreate={quickCreate}
                 onAddKind={(kind, value) => addBlock(kind, value)}
+                handle={normalized || handle}
               >
-
-                  <SocialVerifyPanel handle={normalized || handle} />
 
                   <section className="space-y-3 rounded-2xl border border-border bg-card p-4 sm:p-5">
                     <h2 className="text-lg font-medium">Totaal bereik</h2>

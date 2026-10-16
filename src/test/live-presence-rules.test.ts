@@ -18,3 +18,12 @@ describe("live presence windows", () => {
     expect(isSpotifyVisible({ playing: false })).toBe(false);
   });
 });
+
+import { LIVE_CAPABLE_PROVIDERS as LCP } from "@/lib/live-presence-rules";
+describe("Live Integraties list", () => {
+  it("contains GitHub and WakaTime but not Spotify (presence-backed)", () => {
+    expect(LCP).toContain("github");
+    expect(LCP).toContain("wakatime");
+    expect(LCP).not.toContain("spotify");
+  });
+});

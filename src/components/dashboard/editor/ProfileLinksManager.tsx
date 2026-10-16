@@ -6,7 +6,7 @@ import {
   GripVertical,
   ImagePlus,
   Pin,
-  Plus,
+
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -144,19 +144,12 @@ export function ProfileLinksManager({
   return (
     <section className="space-y-3 rounded-2xl border border-border bg-card p-4 sm:p-5">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-medium">Components</h2>
+        <h2 className="text-lg font-medium">Componenten</h2>
         <span className="text-[11px] text-muted-foreground">
-          {blocks.filter((b) => !b.hidden).length} visible
+          {blocks.filter((b) => !b.hidden).length} zichtbaar
         </span>
       </div>
 
-      <button
-        type="button"
-        onClick={onOpenAddDrawer}
-        className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-foreground text-sm font-medium text-background transition-opacity hover:opacity-90"
-      >
-        <Plus className="h-4 w-4" aria-hidden /> + Add component
-      </button>
 
       <div className="flex flex-wrap gap-2">
         {QUICK_CREATE.map((q) => (

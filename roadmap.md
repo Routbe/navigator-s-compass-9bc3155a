@@ -33,3 +33,6 @@
 - [x] db/92 toegepast in Neon via migrate-gateway
 
 - [x] Inlogcrash op Vercel (connector-only databasecheck) verholpen; na deploy health + e-maillogin op rout.be en rout.dlp.li testen
+- [x] Studio drie lagen: Integratiekluis in catalogus, Live Integraties onder Live Status, één toevoegknop
+- [ ] Meerdere accounts per dienst in de kluis (vereist databasewijziging in user_integrations; nog niet gebouwd)
+- [ ] Fediverse-berichten automatisch verbergen na 24 u
