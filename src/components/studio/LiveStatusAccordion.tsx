@@ -1,5 +1,6 @@
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { StatusContentSettings } from "@/components/dashboard/editor/StatusSettings";
+import { LiveIntegrations } from "@/components/studio/LiveIntegrations";
 import type { ProfileDisplayPrefs } from "@/lib/profile-display";
 
 type SetPref = <K extends keyof ProfileDisplayPrefs>(key: K, value: ProfileDisplayPrefs[K]) => void;
@@ -20,6 +21,10 @@ export function LiveStatusAccordion({ prefs, setPref }: { prefs: ProfileDisplayP
       </AccordionTrigger>
       <AccordionContent className="pb-5">
         <StatusContentSettings prefs={prefs} setPref={setPref} bare />
+        <section className="mt-5 space-y-2 border-t border-border pt-4">
+          <h3 className="text-sm font-medium">⚡ Live Integraties</h3>
+          <LiveIntegrations />
+        </section>
       </AccordionContent>
     </AccordionItem>
   );

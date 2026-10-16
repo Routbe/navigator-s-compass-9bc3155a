@@ -3,7 +3,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { BadgeCheck, Loader2 } from "lucide-react";
-import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { BrandIcon } from "@/components/integrations/BrandIcon";
@@ -55,9 +54,15 @@ function AudiencePicker({ value, onChange, disabled }: { value: Audience; onChan
   );
 }
 
-/** 🔌 Verbindingen & Integraties — app-store raster voor live kaarten op het profiel. */
-export function IntegrationsAccordion() {
+/**
+ * 🔐 Integratiekluis (account-niveau): elke dienst wordt hier één keer gekoppeld en
+ * geverifieerd, en daarna hergebruikt op elk profiel en in elk component.
+ * `focus` toont meteen één dienst (vanuit de componentcatalogus).
+ */
+export function IntegrationVault({ focus }: { focus?: string } = {}) {
   const [filter, setFilter] = useState<IntegrationFilter>("popular");
+  const [focused, setFocused] = useState<string | undefined>(focus);
+  useEffect(() => setFocused(focus), [focus]);
   const qc = useQueryClient();
   const fetchPresence = useServerFn(getMyPresence);
   const setVisible = useServerFn(setSpotifyPresenceVisible);
@@ -175,22 +180,15 @@ export function IntegrationsAccordion() {
   const connectedCount = (spotify ? 1 : 0) + saved.size;
 
   return (
-    <AccordionItem value="integrations" className="rounded-2xl border border-border bg-card px-4 sm:px-5">
-      <AccordionTrigger className="hover:no-underline">
-        <span className="flex min-w-0 flex-1 items-center justify-between gap-3 pr-2">
-          <span className="min-w-0 truncate text-left text-base font-medium">🔌 Verbindingen &amp; Integraties</span>
-          {connectedCount > 0 && (
-            <span className="shrink-0 rounded-full border border-border px-2 py-0.5 text-[10px] text-muted-foreground">
-              {connectedCount} gekoppeld
-            </span>
-          )}
-        </span>
-      </AccordionTrigger>
-      <AccordionContent className="space-y-4 pb-5">
+    <div className="space-y-4">
         <p className="text-sm text-muted-foreground">
-          Koppel je diensten en toon live kaarten op je profiel. Kies per koppeling of ze op je Pro-, Social- of beide profielen verschijnt.
+          Koppel en verifieer een dienst één keer. Daarna gebruik je hem op elk profiel en in elk component, zonder opnieuw te verifiëren.
+          {connectedCount > 0 && <> · <strong>{connectedCount} gekoppeld</strong></>}
         </p>
-        <SnapchatPanel />
+        {!focused && <SnapchatPanel />}
+        {focused ? (
+          <button type="button" onClick={() => setFocused(undefined)} className="text-xs font-medium text-muted-foreground underline underline-offset-2">Toon alle diensten</button>
+        ) : (
         <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none]" role="tablist" aria-label="Categorie">
           {INTEGRATION_FILTERS.map((f) => (
             <button
@@ -208,9 +206,10 @@ export function IntegrationsAccordion() {
             </button>
           ))}
         </div>
+        )}
 
         <div className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2 sm:grid-cols-3">
-          {filterIntegrations(filter).map((item) => {
+          {(focused ? filterIntegrations("all").filter((i) => i.id === focused) : filterIntegrations(filter)).map((item) => {
             const row = saved.get(item.id);
             const isSpotify = item.mode === "oauth";
             const connected = isSpotify ? Boolean(spotify) : Boolean(row);
@@ -388,13 +387,12 @@ export function IntegrationsAccordion() {
             );
           })}
         </div>
-      </AccordionContent>
-    </AccordionItem>
+    </div>
   );
 }
 
 /** Independent per-profile visibility: Verified profile and/or Privacy Alias. */
-function ProfileScope({ label, verified, alias, disabled, onChange }: {
+export function ProfileScope({ label, verified, alias, disabled, onChange }: {
   label: string; verified: boolean; alias: boolean; disabled?: boolean;
   onChange: (v: { verified: boolean; alias: boolean }) => void;
 }) {

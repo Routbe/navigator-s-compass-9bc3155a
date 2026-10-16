@@ -17,6 +17,8 @@ interface Props {
   onAddKind: (kind: string, value?: string) => void;
   /** Extra secties (referrals, QR, badges …) onder de linklijst. */
   children?: ReactNode;
+  /** Profielhandle voor bio-verificatie in de kluis. */
+  handle?: string;
 }
 
 /**
@@ -34,6 +36,7 @@ export function ProfileContentAccordion({
   onQuickCreate,
   onAddKind,
   children,
+  handle,
 }: Props) {
   const [libraryOpen, setLibraryOpen] = useState(false);
   const live = scheduledBlocks(blocks).length;
@@ -57,12 +60,13 @@ export function ProfileContentAccordion({
           onClick={() => setLibraryOpen(true)}
           className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-dashed border-border text-sm font-medium transition-colors hover:bg-muted"
         >
-          <Plus className="h-4 w-4" aria-hidden /> + Inhoudscomponent toevoegen
+          <Plus className="h-4 w-4" aria-hidden /> Component toevoegen
         </button>
         <AddComponentModal
           open={libraryOpen}
           onClose={() => setLibraryOpen(false)}
           onAdd={onAddKind}
+          handle={handle}
         />
 
         <ProfileLinksManager

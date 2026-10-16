@@ -19,3 +19,6 @@ export function isLiveActive(provider: string, lastActiveAt: string | null | und
 export function isSpotifyVisible(np: { playing?: boolean } | null | undefined): boolean {
   return np?.playing === true;
 }
+
+/** Vault providers that feed live data and appear under "Live Integraties" (Spotify lives in presence). */
+export const LIVE_CAPABLE_PROVIDERS: string[] = ["github", "gitlab", "wakatime", "mastodon", "bluesky", "wsocial", "lichess", "chesscom"];
