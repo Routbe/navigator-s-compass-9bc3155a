@@ -2,9 +2,10 @@
 import { sql } from "@/lib/neon";
 import { runSchemaEnsure } from "@/lib/db/schema-ensure.server";
 import { ANSWER_MAX, QUESTION_MAX, normalizeText } from "./questions-rules";
+import { storyUntil, type StoryDuration } from "./question-story-rules";
 
 type Row = Record<string, unknown>;
-export type Question = { id: string; body: string; answer: string | null; published: boolean; createdAt: string; answeredAt: string | null };
+export type Question = { id: string; body: string; answer: string | null; published: boolean; createdAt: string; answeredAt: string | null; storyUntil: string | null };
 
 let ready: Promise<void> | null = null;
 function ensure() {
@@ -17,6 +18,7 @@ function ensure() {
       published boolean not null default false,
       created_at timestamptz not null default now(),
       answered_at timestamptz)`;
+    await sql`alter table public.profile_questions add column if not exists story_until timestamptz`;
   }, "profile-questions");
   return ready;
 }
@@ -30,6 +32,7 @@ function toQ(r: Row): Question {
     published: r["published"] === true,
     createdAt: iso(r["created_at"]) ?? "",
     answeredAt: iso(r["answered_at"]),
+    storyUntil: iso(r["story_until"]),
   };
 }
 
@@ -45,8 +48,10 @@ export async function publishedQuestions(handle: string): Promise<Question[]> {
   await ensure();
   const owner = await publicOwnerId(handle);
   if (!owner) return [];
-  const rows = (await sql`select id, body, answer, published, created_at, answered_at from public.profile_questions
-     where owner_id = ${owner} and published and answer is not null order by answered_at desc limit 30`) as Row[];
+  const rows = (await sql`select id, body, answer, published, created_at, answered_at, story_until from public.profile_questions
+     where owner_id = ${owner} and published and answer is not null
+       and (story_until is null or story_until > now())
+     order by answered_at desc limit 30`) as Row[];
   return rows.map(toQ);
 }
 
@@ -62,15 +67,23 @@ export async function askQuestion(handle: string, raw: string): Promise<"ok" | "
 
 export async function myQuestions(ownerId: string): Promise<Question[]> {
   await ensure();
-  const rows = (await sql`select id, body, answer, published, created_at, answered_at from public.profile_questions
+  const rows = (await sql`select id, body, answer, published, created_at, answered_at, story_until from public.profile_questions
      where owner_id = ${ownerId} order by created_at desc limit 200`) as Row[];
   return rows.map(toQ);
 }
 
-export async function answerQuestion(ownerId: string, id: string, raw: string, publish: boolean): Promise<"ok" | "invalid"> {
+export async function answerQuestion(
+  ownerId: string,
+  id: string,
+  raw: string,
+  publish: boolean,
+  duration: StoryDuration = "permanent",
+): Promise<"ok" | "invalid"> {
   const answer = normalizeText(raw, ANSWER_MAX);
   if (!answer) return "invalid";
-  await sql`update public.profile_questions set answer = ${answer}, published = ${publish}, answered_at = now()
+  const until = publish ? storyUntil(duration) : null;
+  await sql`update public.profile_questions set answer = ${answer}, published = ${publish}, answered_at = now(),
+       story_until = ${until}::timestamptz
      where id = ${id} and owner_id = ${ownerId}`;
   return "ok";
 }

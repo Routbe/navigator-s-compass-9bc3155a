@@ -47,10 +47,14 @@ const idSchema = z.object({ id: z.string().uuid() });
 
 export const answerMyQuestion = createServerFn({ method: "POST" })
   .middleware([requireAuth])
-  .inputValidator((input: unknown) => idSchema.extend({ answer: z.string().max(ANSWER_MAX * 2), publish: z.boolean() }).parse(input))
+  .inputValidator((input: unknown) => idSchema.extend({
+        answer: z.string().max(ANSWER_MAX * 2),
+        publish: z.boolean(),
+        duration: z.enum(["24h", "permanent"]).default("permanent"),
+      }).parse(input))
   .handler(async ({ data, context }) => {
     const s = await import("./questions.server");
-    return { result: await s.answerQuestion(context.userId, data.id, data.answer, data.publish) };
+    return { result: await s.answerQuestion(context.userId, data.id, data.answer, data.publish, data.duration) };
   });
 
 export const unpublishMyQuestion = createServerFn({ method: "POST" })
