@@ -1,3 +1,5 @@
+import { SectionTitle } from "@/components/studio/SectionTitle";
+import { CircleUserRound as SICircleUserRound, Image as SIImage, Tag as SITag, Type as SIType } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -79,7 +81,7 @@ export function ProfileThemePicker({
       >
         <AccordionTrigger className="hover:no-underline">
           <span className="flex flex-1 items-center justify-between gap-3 pr-2">
-            <span className="text-base font-medium">👤 Avatar, Header &amp; Frames</span>
+            <SectionTitle icon={SICircleUserRound}>Avatar, Header &amp; Frames</SectionTitle>
             <span className="rounded-full border border-border px-2 py-0.5 text-[10px] text-muted-foreground">
               {avatarFrameLabel(prefs.avatarFrame)}
             </span>
@@ -186,7 +188,7 @@ export function ProfileThemePicker({
       >
         <AccordionTrigger className="hover:no-underline">
           <span className="flex flex-1 items-center justify-between gap-3 pr-2">
-            <span className="text-base font-medium">🔘 Knoppen &amp; Typografie</span>
+            <SectionTitle icon={SIType}>Knoppen &amp; Typografie</SectionTitle>
             <span className="rounded-full border border-border px-2 py-0.5 text-[10px] text-muted-foreground">
               {CARD_STYLES.find((c) => c.id === cardStyle)?.label ?? cardStyle}
             </span>
@@ -254,7 +256,7 @@ export function ProfileThemePicker({
       >
         <AccordionTrigger className="hover:no-underline">
           <span className="flex flex-1 items-center justify-between gap-3 pr-2">
-            <span className="text-base font-medium">🏷️ Footer &amp; Branding</span>
+            <SectionTitle icon={SITag}>Footer &amp; Branding</SectionTitle>
           </span>
         </AccordionTrigger>
         <AccordionContent className="pb-5">
@@ -274,7 +276,7 @@ export function ProfileThemePicker({
       >
         <AccordionTrigger className="hover:no-underline">
           <span className="flex flex-1 items-center justify-between gap-3 pr-2">
-            <span className="text-base font-medium">🖼️ Achtergrond &amp; Visual FX</span>
+            <SectionTitle icon={SIImage}>Achtergrond &amp; Visual FX</SectionTitle>
             <span className="rounded-full border border-border px-2 py-0.5 text-[10px] text-muted-foreground">
               {BACKGROUND_STYLES.find((o) => o.id === prefs.backgroundStyle)?.label ??
                 prefs.backgroundStyle}

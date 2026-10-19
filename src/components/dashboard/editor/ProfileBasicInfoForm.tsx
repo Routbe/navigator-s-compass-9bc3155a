@@ -1,3 +1,5 @@
+import { SectionTitle } from "@/components/studio/SectionTitle";
+import { UserRound as SIUserRound } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { AvatarUpload } from "@/components/settings/AvatarUpload";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -37,7 +39,7 @@ export function ProfileBasicInfoForm({
       className="rounded-2xl border border-border bg-card px-4 sm:px-5"
     >
       <AccordionTrigger className="hover:no-underline">
-        <span className="text-base font-medium">👤 Profiel Basisinformatie</span>
+        <SectionTitle icon={SIUserRound}>Profiel Basisinformatie</SectionTitle>
       </AccordionTrigger>
       <AccordionContent className="space-y-4 pb-5">
         {/* Permanent Profile Info Card */}

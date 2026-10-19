@@ -1,3 +1,5 @@
+import { SectionTitle } from "@/components/studio/SectionTitle";
+import { UserRound as SIUserRound } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Check, Loader2, MapPin, Smile } from "lucide-react";
@@ -130,7 +132,7 @@ export function ProfileBasicInfoAccordion({
     >
       <AccordionTrigger className="hover:no-underline">
         <span className="flex flex-1 items-center justify-between gap-3 pr-2">
-          <span className="text-base font-medium">👤 Profiel Basisinformatie</span>
+          <SectionTitle icon={SIUserRound}>Profiel Basisinformatie</SectionTitle>
           <span className="text-[11px] text-muted-foreground">
             {saving ? (
               <span className="inline-flex items-center gap-1">

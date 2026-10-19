@@ -1,3 +1,5 @@
+import { SectionTitle } from "@/components/studio/SectionTitle";
+import { Archive as SIArchive, AtSign as SIAtSign, CreditCard as SICreditCard, Globe as SIGlobe, Heart as SIHeart, Link2 as SILink2, Medal as SIMedal, QrCode as SIQrCode, Share2 as SIShare2 } from "lucide-react";
 import { GuestbookAccordion } from "@/components/studio/GuestbookAccordion";
 import { QuestionsInboxAccordion } from "@/components/studio/QuestionsInboxAccordion";
 import { QrCode } from "lucide-react";
@@ -999,7 +1001,7 @@ export function ProfileEditor({ variant = "verified" }: { variant?: ProfileVaria
                 className="rounded-2xl border border-border bg-card px-4 sm:px-5"
               >
                 <AccordionTrigger className="hover:no-underline">
-                  <span className="text-base font-medium">QR, privacy &amp; delen</span>
+                  <SectionTitle icon={SIQrCode}>QR, privacy &amp; delen</SectionTitle>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-4 pb-5">
                   {/* Eén bron van waarheid: QR-styling gebeurt in de generator. */}
@@ -1278,7 +1280,7 @@ export function ProfileEditor({ variant = "verified" }: { variant?: ProfileVaria
                 className="rounded-2xl border border-border bg-card px-4 sm:px-5"
               >
                 <AccordionTrigger className="hover:no-underline">
-                  <span className="text-base font-medium">💳 Betalingen &amp; facturen</span>
+                  <SectionTitle icon={SICreditCard}>Betalingen &amp; facturen</SectionTitle>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-4 pb-5">
                   <section className="space-y-3 rounded-2xl border border-border bg-card p-4 sm:p-5">
@@ -1305,7 +1307,7 @@ export function ProfileEditor({ variant = "verified" }: { variant?: ProfileVaria
                 className="rounded-2xl border border-border bg-card px-4 sm:px-5"
               >
                 <AccordionTrigger className="hover:no-underline">
-                  <span className="text-base font-medium">📦 Data, export &amp; domein</span>
+                  <SectionTitle icon={SIArchive}>Data, export &amp; domein</SectionTitle>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-4 pb-5">
                   <section className="space-y-3 rounded-2xl border border-border bg-card p-4 sm:p-5">
@@ -1328,9 +1330,7 @@ export function ProfileEditor({ variant = "verified" }: { variant?: ProfileVaria
                 className="rounded-2xl border border-border bg-card px-4 sm:px-5"
               >
                 <AccordionTrigger className="hover:no-underline">
-                  <span className="text-base font-medium">
-                    🏷️ Social Sharing &amp; SEO Metadata
-                  </span>
+                  <SectionTitle icon={SIShare2}>Social Sharing &amp; SEO Metadata</SectionTitle>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-4 pb-5">
                   <SocialSharingCard
@@ -1367,7 +1367,7 @@ export function ProfileEditor({ variant = "verified" }: { variant?: ProfileVaria
                 className="rounded-2xl border border-border bg-card px-4 sm:px-5"
               >
                 <AccordionTrigger className="hover:no-underline">
-                  <span className="text-base font-medium">🔗 Handle, URL &amp; identiteit</span>
+                  <SectionTitle icon={SILink2}>Handle, URL &amp; identiteit</SectionTitle>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-4 pb-5">
                   <section className="rounded-2xl border border-border bg-card p-4 sm:p-5">
@@ -1559,7 +1559,7 @@ export function ProfileEditor({ variant = "verified" }: { variant?: ProfileVaria
                 className="rounded-2xl border border-border bg-card px-4 sm:px-5"
               >
                 <AccordionTrigger className="hover:no-underline">
-                  <span className="text-base font-medium">🏅 ROUT Badges &amp; weergave</span>
+                  <SectionTitle icon={SIMedal}>ROUT Badges &amp; weergave</SectionTitle>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-4 pb-5">
                   <VerifiedBadgeCard verified={verified} handle={handle || null} />
@@ -1741,7 +1741,7 @@ export function ProfileEditor({ variant = "verified" }: { variant?: ProfileVaria
                 className="rounded-2xl border border-border bg-card px-4 sm:px-5"
               >
                 <AccordionTrigger className="hover:no-underline">
-                  <span className="text-base font-medium">💛 Steunpagina &amp; donaties</span>
+                  <SectionTitle icon={SIHeart}>Steunpagina &amp; donaties</SectionTitle>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-4 pb-5">
                   <TipPagePanel />
@@ -1758,7 +1758,7 @@ export function ProfileEditor({ variant = "verified" }: { variant?: ProfileVaria
                 className="rounded-2xl border border-border bg-card px-4 sm:px-5"
               >
                 <AccordionTrigger className="hover:no-underline">
-                  <span className="text-base font-medium">🌐 Subdomeinen &amp; Custom Domains</span>
+                  <SectionTitle icon={SIGlobe}>Subdomeinen &amp; Custom Domains</SectionTitle>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-4 pb-5">
                   <SubdomainPanel />
@@ -1772,9 +1772,7 @@ export function ProfileEditor({ variant = "verified" }: { variant?: ProfileVaria
                 className="rounded-2xl border border-border bg-card px-4 sm:px-5"
               >
                 <AccordionTrigger className="hover:no-underline">
-                  <span className="text-base font-medium">
-                    🦋 Bluesky DID &amp; Identity Protocol
-                  </span>
+                  <SectionTitle icon={SIAtSign}>Bluesky DID &amp; Identity Protocol</SectionTitle>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-4 pb-5">
                   <BlueskyWizard />

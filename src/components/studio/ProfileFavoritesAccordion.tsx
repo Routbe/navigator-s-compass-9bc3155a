@@ -1,3 +1,5 @@
+import { SectionTitle } from "@/components/studio/SectionTitle";
+import { Star as SIStar } from "lucide-react";
 import { useRef, useState } from "react";
 import { GripVertical } from "lucide-react";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -65,7 +67,7 @@ export function ProfileFavoritesAccordion({
     >
       <AccordionTrigger className="hover:no-underline">
         <span className="flex flex-1 items-center justify-between gap-3 pr-2">
-          <span className="text-base font-medium">⭐ Favorieten &amp; curatie</span>
+          <SectionTitle icon={SIStar}>Favorieten &amp; curatie</SectionTitle>
           <span className="rounded-full border border-border px-2 py-0.5 text-[10px] text-muted-foreground">
             {favorites.length}/{MAX_FAVORITES}
           </span>
