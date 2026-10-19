@@ -1,3 +1,5 @@
+import { SectionTitle } from "@/components/studio/SectionTitle";
+import { Lightbulb as SILightbulb } from "lucide-react";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ConversionCoach } from "@/components/dashboard/ConversionCoach";
 import { auditProfile, hasPrimaryAction, type ConversionFix } from "@/lib/conversion-coach";
@@ -80,7 +82,7 @@ export function ConversionCoachAccordion({
     >
       <AccordionTrigger className="hover:no-underline">
         <span className="flex flex-1 items-center justify-between gap-3 pr-2">
-          <span className="text-base font-medium">💡 Conversie Coach &amp; Optimalisatie</span>
+          <SectionTitle icon={SILightbulb}>Conversie Coach &amp; Optimalisatie</SectionTitle>
           <span className="rounded-full border border-border px-2 py-0.5 text-[10px] text-muted-foreground">
             {audit.score}%
           </span>

@@ -1,7 +1,8 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Pin, PinOff, Trash2 } from "lucide-react";
+import { Pin, PinOff, StickyNote, Trash2 } from "lucide-react";
+import { SectionTitle } from "@/components/studio/SectionTitle";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { deleteGuestbookNote, getMyGuestbook, pinGuestbookNote } from "@/lib/guestbook.functions";
 import { GUESTBOOK_PIN_LIMIT } from "@/lib/guestbook-rules";
@@ -20,10 +21,9 @@ export function GuestbookAccordion() {
   return (
     <AccordionItem value="guestbook" className="rounded-2xl border border-border bg-card px-4 sm:px-5">
       <AccordionTrigger className="hover:no-underline">
-        <span className="text-left">
-          <span className="block text-sm font-medium">Prikbord</span>
-          <span className="block text-xs text-muted-foreground">{notes.length} berichten · {pinnedCount}/{GUESTBOOK_PIN_LIMIT} gepind</span>
-        </span>
+        <SectionTitle icon={StickyNote} hint={`${notes.length} berichten · ${pinnedCount}/${GUESTBOOK_PIN_LIMIT} gepind`}>
+          Prikbord
+        </SectionTitle>
       </AccordionTrigger>
       <AccordionContent className="space-y-2 pb-5">
         {notes.length === 0 && <p className="text-xs text-muted-foreground">Nog geen berichten. Ingelogde ROUT-leden kunnen er op je profiel één achterlaten.</p>}

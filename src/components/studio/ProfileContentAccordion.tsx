@@ -1,3 +1,5 @@
+import { SectionTitle } from "@/components/studio/SectionTitle";
+import { LayoutList as SILayoutList } from "lucide-react";
 import { type Dispatch, type ReactNode, type SetStateAction, useState } from "react";
 import { Plus } from "lucide-react";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -48,7 +50,7 @@ export function ProfileContentAccordion({
     >
       <AccordionTrigger className="hover:no-underline">
         <span className="flex flex-1 items-center justify-between gap-3 pr-2">
-          <span className="text-base font-medium">🔗 Links &amp; Inhoudscomponenten</span>
+          <SectionTitle icon={SILayoutList}>Links &amp; Inhoudscomponenten</SectionTitle>
           <span className="rounded-full border border-border px-2 py-0.5 text-[10px] text-muted-foreground">
             {live} zichtbaar
           </span>

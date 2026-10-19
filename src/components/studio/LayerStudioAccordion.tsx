@@ -1,3 +1,4 @@
+import { SectionTitle } from "@/components/studio/SectionTitle";
 import { useMemo, useState } from "react";
 import { STICKER_CATEGORIES } from "@/lib/sticker-library";
 import { ArrowDown, ArrowUp, Eye, EyeOff, GripVertical, Layers, Plus, Trash2 } from "lucide-react";
@@ -114,7 +115,7 @@ export function LayerStudioAccordion({ value, onChange, blocks }: Props) {
   return (
     <AccordionItem value="layers" className="rounded-2xl border border-border bg-card px-4">
       <AccordionTrigger className="text-sm font-medium">
-        <span className="flex items-center gap-2"><Layers className="h-4 w-4" /> Lagen-studio</span>
+        <SectionTitle icon={Layers}>Lagen-studio</SectionTitle>
       </AccordionTrigger>
       <AccordionContent className="space-y-6 pb-5">
         {/* Presets */}

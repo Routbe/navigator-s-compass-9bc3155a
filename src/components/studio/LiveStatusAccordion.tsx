@@ -1,3 +1,5 @@
+import { SectionTitle } from "@/components/studio/SectionTitle";
+import { MessageCircle as SIMessageCircle } from "lucide-react";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { StatusContentSettings } from "@/components/dashboard/editor/StatusSettings";
 import { LiveIntegrations } from "@/components/studio/LiveIntegrations";
@@ -11,7 +13,7 @@ export function LiveStatusAccordion({ prefs, setPref }: { prefs: ProfileDisplayP
     <AccordionItem value="live_status" className="rounded-2xl border border-border bg-card px-4 sm:px-5">
       <AccordionTrigger className="hover:no-underline">
         <span className="flex flex-1 items-center justify-between gap-3 pr-2">
-          <span className="text-base font-medium">💬 Live Status &amp; Gedachten</span>
+          <SectionTitle icon={SIMessageCircle}>Live Status &amp; Gedachten</SectionTitle>
           {prefs.statusLine && (
             <span className="max-w-[45%] truncate rounded-full border border-border px-2 py-0.5 text-[10px] text-muted-foreground">
               {prefs.statusLine}
