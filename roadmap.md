@@ -36,3 +36,16 @@
 - [x] Studio drie lagen: Integratiekluis in catalogus, Live Integraties onder Live Status, één toevoegknop
 - [ ] Meerdere accounts per dienst in de kluis (vereist databasewijziging in user_integrations; nog niet gebouwd)
 - [ ] Fediverse-berichten automatisch verbergen na 24 u
+
+## Workspaces & beheer (okt 2026)
+- [ ] Live voorbeelden/kaartjes tonen exact dezelfde foto, kader, decoratie, vinkje en lettertype als het profiel
+- [ ] Onboarding: eerst inloggen, daarna keuze "Voor mezelf" of "Voor een bedrijf" (workspace met eigen handle)
+- [ ] Workspaces: aanmaken, leden toevoegen, publieke pagina rout.be/space/<naam>, domeinverificatie (DNS/bestand/rel=me)
+- [ ] Bedrijfsverificatie via workspace (aanvraag + bevestigingsmails), knop op profiel legt uit dat bedrijven een workspace zijn
+- [ ] Infopagina over workspaces/bedrijven
+- [ ] Beheer: Net actief (iedereen/selectie/uitsluiten) en Uitgelicht apart instellen
+- [ ] Beheer: handles van profielen en workspaces vergrendelen/blokkeren/hernoemen, verificatie intrekken + gratis herverificatie
+- [ ] "Binnenkort"-integraties: meld-me-aan + e-mail bij beschikbaarheid
+- [ ] Subdomein-noodroute username.r.rout.be met statusmelding (wacht op DNS/Vercel-bevestiging)
+- [ ] Studio: Profiel-QR uit Instellingen, customize-knop naast Knopvorm/Typografie, antwoorden als verhaal, Bluesky-handle, Mastodon rel=me
+- Prijzen bedrijfsverificatie: NIET publiceren tot expliciet besluit
